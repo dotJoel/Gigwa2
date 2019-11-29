@@ -355,19 +355,13 @@ public class Ga4ghRestController extends ControllerInterface {
     public SearchCallSetsResponse searchCallSets(HttpServletRequest request, HttpServletResponse response, @RequestBody SearchCallSetsRequest callSetsRequest) throws IOException {
 
         String token = tokenManager.readToken(request);
-        String id = callSetsRequest.getVariantSetId();
-        try
-        {
-	        if (tokenManager.canUserReadDB(token, id.split(GigwaGa4ghServiceImpl.ID_SEPARATOR)[0])) {
-	            return service.searchCallSets(callSetsRequest);
-	        } else {
-	            buildForbiddenAccessResponse(token, response);
-	            return null;
-	        }
-		} catch (ObjectNotFoundException e) {
-            build404Response(response);
+    	String[] splitId = callSetsRequest.getVariantSetId().split(GigwaGa4ghServiceImpl.ID_SEPARATOR);
+        if (tokenManager.canUserReadProject(token, splitId[0], Integer.parseInt(splitId[1]))) {
+            return service.searchCallSets(callSetsRequest);
+        } else {
+            buildForbiddenAccessResponse(token, response);
             return null;
-		}
+        }
     }
 
     /**
